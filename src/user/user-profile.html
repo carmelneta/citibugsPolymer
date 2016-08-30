@@ -3,41 +3,48 @@
 <link rel="import" href="../shared-styles.html">
 <link rel="import" href="behaviors.html">
 
-<link rel="import" href="../../bower_components/polymerfire/polymerfire.html">
-<link rel="import" href="../../bower_components/polymerfire/firebase-auth.html">
+<!--<link rel="import" href="fire-wrap.html">-->
 
 
 <dom-module id="user-profile">
-  
+  <style>
+    .content {
+      padding: 10px;
+    }
+
+    paper-progress {
+      width: 100%;
+    }
+  </style>
   <template>
-    <firebase-auth id="auth" app-name="citybugs" user="{{usera}}"></firebase-auth>
-    <div class="card">   
-      <h1 on-tap="ca">User Profile</h1>
-    </div>
+    <firebase-auth id="auth" app-name="citybugs" user="{{user}}" status-known="{{fbAuthStatus}}"></firebase-auth>
+
+    <template is="dom-if" if="{{isLoggedIn}}">
+      <div class="content">
+        <div class="card">   
+          <h1 on-tap="ca">User Profile</h1> 
+        </div>
+      </div>
+    </template> 
   </template>
 
   <script>
     Polymer({
       is: 'user-profile',
-      properties: {        
-        user: {
-          type: Object,
-          observer: '_userAuthChange'
-        }
+      properties: { 
+          mycarmel: {
+            type: String,
+            observer: '_mycarmelChange'
+          }
+      }, 
+      _mycarmelChange: function(value){
+        console.log( 'Carmel Value Changed: ',value);
       },
       behaviors: [LoginOnlyPage],
       ready: function() {
-        console.log( 'Ready user profile');
-      },
-      ca: function(){
-        console.log(this.usera, this.$.auth.statusKnown);
-      },
-      
-      _userAuthChange: function(user) {
-        var isLoggedIn = user ? true : false;
-        // console.log('asd', isLoggedIn);
-        console.log(this.$.auth.statusKnown);
-      }
+        console.log( 'Ready user profile', this.isLoggedIn);
+      },  
+       
     });
   </script>
 </dom-module>

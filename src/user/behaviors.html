@@ -1,19 +1,52 @@
+<link rel="import" href="../../bower_components/paper-progress/paper-progress.html">
+
+<link rel="import" href="../../bower_components/polymerfire/polymerfire.html">
+<link rel="import" href="../../bower_components/polymerfire/firebase-auth.html">
+
 <script>
     LoginOnlyPage = {
-      properties: {
-        usera : {
+      properties: { 
+        fbAuthStatus: {
+          type: Boolean,
+          value: false,
+          observer: '_AuthStatusKnownChange'
+        },
+        isLoggedIn: {
+          //  Is Logged in will true only after the auth status is ready AND the user is logged in
+          type: Boolean,
+          value: false
+        },
+        user: {
           type: Object,
-          observer: '_userAuthChange'
+          observer: '_AuthUserChange'
         }
       },
       attached: function() {
-        // console.log('Highlighting for ', this.usera);
+        
+        this.progress = document.createElement('paper-progress'); 
+        var beforeNode = Polymer.dom(this.root).childNodes[0]; 
+        this.progress.setAttribute('indeterminate', true);
+        Polymer.dom(this.root).insertBefore(this.progress, beforeNode);
+
       },
 
-      _userAuthChange: function(user) {
-        var isLoggedIn = user ? true : false;
-        // console.log('asd', isLoggedIn);
-        console.log(this.$.auth.statusKnown);
+      _AuthStatusKnownChange: function( status ){
+        // console.log( 'Auth Status: ',status, this.$.auth.signedIn );
+        this.fbAuthStatus = status;
+        if(status) {
+          this.progress.remove();
+          this._AuthUserChange();
+        }
+      },
+
+      _AuthUserChange: function() {
+
+        // this.user = this.$.auth.user;
+        if(this.user) {
+          this.isLoggedIn = true;
+        }else {
+          this.isLoggedIn = false;
+        }
       }
     };
 </script>

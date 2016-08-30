@@ -1,0 +1,43 @@
+<link rel="import" href="../../bower_components/polymerfire/polymerfire.html">
+<link rel="import" href="../../bower_components/polymerfire/firebase-auth.html">
+ 
+
+<dom-module id="fire-wrap">
+  
+  <template>
+     hallo
+    <firebase-auth id="auth" app-name="citybugs" user="{{user}}" status-known="{{fbAuthStatus}}"></firebase-auth>
+  </template>
+
+  <script>
+    FireWrap = Polymer({
+      is: 'fire-wrap',
+      factoryImpl: function(foo) {
+        console.log('FACOTU');
+      },
+      
+        hostAttributes: {
+          'carmel': '{{mycarmel}}'
+        },
+      properties: {  
+        carmel: {
+          type: String,
+          value: 'Carmel',          
+          notify: true,
+          // reflectToAttribute: true,
+          observer: "carmelChanged"
+        }
+      }, 
+      ready: function() {
+        console.log( 'hello' );         
+        var self = this;
+        // setInterval(function(){ self.carmel += 'a'; }, 3000);
+      },
+      
+      // property-name-changed
+      carmelChanged: function(value){
+        console.log('Inner Observer', value);
+      }       
+    });
+  </script>
+</dom-module>
