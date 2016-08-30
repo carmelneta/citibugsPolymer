@@ -1,0 +1,51 @@
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/paper-menu-button/paper-menu-button.html">
+<link rel="import" href="../../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../../bower_components/paper-menu/paper-menu.html">
+
+    
+<dom-module id="user-menu">
+   
+  <style> 
+  </style>
+
+  <template>
+
+    <firebase-auth id="auth" app-name="citybugs" user="{{user}}"></firebase-auth>
+    
+    <paper-menu-button no-overlap dynamic-align>
+      <paper-icon-button icon="icons:account-circle" class="dropdown-trigger"></paper-icon-button>
+      <paper-menu class="dropdown-content">
+
+        <template is="dom-if" if="{{user}}">          
+          <paper-item>LogOut</paper-item>        
+        </template>
+        <template is="dom-if" if="{{!user}}">
+          <paper-item><a name="loginform" href="/user/login">Login</a></paper-item>
+          <!--<paper-item><a name="view3" href="/view3">View Three</a></paper-item>-->
+        </template>
+      </paper-menu>
+    </paper-menu-button>
+
+  </template>
+
+
+  <script>
+    Polymer({
+      is: 'user-menu',
+      properties: {        
+        carmel: {
+          type: Boolean,
+          value: false
+        }
+      },
+      ready: function() {
+        // console.log(this.$.auth.signedIn, this.$.auth.statusKnown, this.user, this.carmel);
+        // this.carmel = true;
+      },
+      care : function(){
+        console.log(this.$.auth.signedIn, this.$.auth.statusKnown);
+      }
+    });
+  </script>
+</dom-module>

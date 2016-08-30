@@ -1,0 +1,19 @@
+<script>
+    LoginOnlyPage = {
+      properties: {
+        usera : {
+          type: Object,
+          observer: '_userAuthChange'
+        }
+      },
+      attached: function() {
+        // console.log('Highlighting for ', this.usera);
+      },
+
+      _userAuthChange: function(user) {
+        var isLoggedIn = user ? true : false;
+        // console.log('asd', isLoggedIn);
+        console.log(this.$.auth.statusKnown);
+      }
+    };
+</script>

@@ -1,0 +1,43 @@
+
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../shared-styles.html">
+<link rel="import" href="behaviors.html">
+
+<link rel="import" href="../../bower_components/polymerfire/polymerfire.html">
+<link rel="import" href="../../bower_components/polymerfire/firebase-auth.html">
+
+
+<dom-module id="user-profile">
+  
+  <template>
+    <firebase-auth id="auth" app-name="citybugs" user="{{usera}}"></firebase-auth>
+    <div class="card">   
+      <h1 on-tap="ca">User Profile</h1>
+    </div>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'user-profile',
+      properties: {        
+        user: {
+          type: Object,
+          observer: '_userAuthChange'
+        }
+      },
+      behaviors: [LoginOnlyPage],
+      ready: function() {
+        console.log( 'Ready user profile');
+      },
+      ca: function(){
+        console.log(this.usera, this.$.auth.statusKnown);
+      },
+      
+      _userAuthChange: function(user) {
+        var isLoggedIn = user ? true : false;
+        // console.log('asd', isLoggedIn);
+        console.log(this.$.auth.statusKnown);
+      }
+    });
+  </script>
+</dom-module>
