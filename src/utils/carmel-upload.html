@@ -1,0 +1,123 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-spinner/paper-spinner-lite.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/file-input/file-input.html">
+<link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../../bower_components/paper-card/paper-card.html">
+
+
+<link rel="import" href="../shared-styles.html">
+
+<dom-module id="carmel-upload">
+  <template>
+    <style include="shared-styles">
+      :host {
+        display: block;
+      }
+
+      paper-button {
+        margin-left: 0;
+        margin-right: 10px;
+      }
+
+      paper-spinner-lite {
+        vertical-align: middle;
+      }
+
+
+      #image-preview {
+        border: 1px dashed #00ba35;
+        margin: 20px 0;
+      }
+      #image-preview img {
+        width: 90px;
+        height: 90px;
+        margin: 10px;
+      }
+      
+    </style>
+     
+    <firebase-document
+      id="fbDoc"
+      app-name="citybugs"
+      path="[[ref]]"
+      data="{{metadata}}">
+    </firebase-document>
+
+    <paper-button raised>
+      <file-input id="mainFile" on-change="_onUpload">Image</file-input>
+    </paper-button>
+    
+    <paper-button raised on-tap="test">TEST FILE</paper-button>
+  
+    <paper-spinner-lite active=[[_isLoading]]></paper-spinner-lite>
+      
+    <div class="layout horizontal wrap around-justified" id="image-preview"> 
+      <template is="dom-repeat" items="{{images}}"  id="imagesRepeat">
+        <img src="[[item.url]]"> 
+      </template>
+    </div>
+
+  </template>
+
+  <script>
+    Polymer({
+      is: 'carmel-upload',
+      
+      properties: {
+        ref: {
+          type: String
+        },
+        uid: String,
+        _isLoading: {
+          type: Boolean
+        },
+        images: {
+          type: Array,
+          value: []
+        }
+      },
+
+      ready: function() {  
+      },
+    
+      _onUpload: function(e, detail) {
+        
+        for(var i=0; i < detail.valid.length; i++) {
+          // console.log(i, detail.valid[i]);
+          this._doUpload(detail.valid[i]);
+        }
+      },
+
+      _doUpload: function(file) {
+        // const file = detail.valid[0];
+        this._isLoading = true;
+        
+        var storageRef = this.$.fbDoc.app.storage().ref();
+        var uploadTask = storageRef.child('images/' + this.uid +'/' + file.name).put(file);
+        
+        uploadTask.on('state_changed', (snapshot) => {
+          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        }, (error) => {
+          // Handle unsuccessful uploads
+          console.error(error);
+          this._isLoading = false;
+        }, () => {
+          // Handle successful uploads on complete
+          // For instance, get the download URL: https://firebasestorage.googleapis.com/...
+          const metadata = {
+            fullPath: uploadTask.snapshot.metadata.fullPath,
+            name: file.name,
+            url: uploadTask.snapshot.metadata.downloadURLs[0]
+          };
+          console.log(metadata);
+          // this.images.push(metadata);
+          this._isLoading = false;
+           this.push('images', metadata);
+        });
+      }
+
+    });
+  </script>
+</dom-module>
