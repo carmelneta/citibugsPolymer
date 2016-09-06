@@ -1,0 +1,42 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/app-route/app-route.html">
+<link rel="import" href="utils/global-behaviors.html">
+
+<dom-module id="my-obs">
+  
+  <template>
+
+    <app-location route="{{route}}"></app-location>
+    
+    <app-route route="{{route}}" pattern="/obs/:subpage" data="{{routeData}}">
+    </app-route>
+
+    <div class="content">
+
+        <iron-pages selected="[[page]]" attr-for-selected="name">            
+          <view-ob name="view"></view-ob>
+          <add-ob name="add"></add-ob>          
+          <view-404 name="view404"></view-404>
+        </iron-pages>
+    </div>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'my-obs',
+      behaviors: [routeUtils],
+      counter: 1, 
+      ready: function() {  
+      },
+      
+      routerElement: {
+        defaultRoute: 'view',
+        base: 'obs'
+      },
+      pagesToUrl: {
+        view : 'view-ob',
+        add: 'add-ob'
+      }
+    });
+  </script>
+</dom-module>

@@ -5,22 +5,122 @@
 <link rel="import" href="../../bower_components/paper-menu-button/paper-menu-button.html">
 <link rel="import" href="../../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../../bower_components/paper-menu/paper-menu.html">
+<link rel="import" href="../../bower_components/paper-material/paper-material.html">
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+
+<link rel="import" href="behaviors.html">
+
 <link rel="import" href="../my-icons.html">
 
-<dom-module id="login-form">
-  
-  <template>
+<link rel="import" href="../shared-styles.html">
 
-    <div class="card">   
-      <h1>LOGIN FORM</h1>
-    </div>
+
+<dom-module id="login-form">
+  <style include="shared-styles">
+    
+      :host {
+        display: block;
+        min-height: calc(100vh - 64px);
+        
+        @apply(--layout-vertical);
+        @apply(--layout-center);
+      }
+      .container {
+        background: white;
+        padding: 10px;        
+        margin: auto;
+      }
+
+      h3 {
+        margin: auto
+      }
+
+      .actions {
+        margin-top: 30px;
+      }
+
+      paper-button.primary {        
+        background-color: var(--paper-green-500);
+        color: white;
+      }
+      paper-button.secondary {        
+        background-color: var(--paper-blue-500);
+        color: white;
+      }
+      
+      paper-button.danger {
+        
+        background-color: var(--paper-red-500);
+        color: white;
+
+      }
+  </style>
+  <template>
+    <app-location route="{{route}}"></app-location>
+    
+    <firebase-auth id="auth" app-name="citybugs" user="{{user}}" status-known="{{fbAuthStatus}}"></firebase-auth>
+
+    </firebase-auth>
+    <paper-material elevation="3" class="container">
+      
+    
+      <div class="login-form" hidden$="{{isLoggedIn}}">
+        <h3>Login</h3>
+        <paper-input label="Email" type="email" value="{{userForm.email}}"></paper-input>
+        <paper-input label="Password" type="password" value="{{userForm.password}}"></paper-input>
+        
+        <div class="actions layout horizontal justified">
+          <paper-button on-tap="login" raised class="primary">Login</paper-button>
+          <paper-button raised class="secondary">Create</paper-button>
+        </div>
+      </div>
+
+      <div hidden$="{{!isLoggedIn}}">
+        <div class="layout horizontal justified">
+          You seems to logged in allreay.
+          <paper-button on-tap="logout" raised class="danger">Logout</paper-button>
+        </div>
+      </div>
+
+    </paper-material>
+    
   </template>
 
   <script>
     Polymer({
       is: 'login-form',
+      behaviors: [LoginOnlyPage],
+      properties: {
+        userForm : {
+          type: Object,
+          value: {
+            email: 'carmelneta@gmail.com',
+            password: ''
+          }
+        }
+      },
       ready: function() {
-        console.log( 'Ready Login form');
+        // console.log( 'Ready Login form');
+      },
+      login: function() {
+        // console.log('Login: ', this.userForm);
+        var self = this;
+        if( this.userForm.email.length && this.userForm.password.length ) {
+          this.$.auth.signInWithEmailAndPassword( this.userForm.email, this.userForm.password)
+            .then(function(results){
+
+              self.set('route.path', '/');
+
+            }, function(err){
+
+              //  Do ME - Hendle auth error
+              console.log(err);
+            });
+        }
+      },
+      logout: function() {
+        this.$.auth.signOut();
       }
     });
   </script>

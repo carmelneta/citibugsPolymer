@@ -1,77 +1,41 @@
-
 <link rel="import" href="../bower_components/polymer/polymer.html">
-<link rel="import" href="shared-styles.html">
-
 <link rel="import" href="../bower_components/app-route/app-route.html">
-<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
-<link rel="import" href="../bower_components/paper-menu-button/paper-menu-button.html">
-<link rel="import" href="../bower_components/paper-item/paper-item.html">
-<link rel="import" href="../bower_components/paper-menu/paper-menu.html">
-<link rel="import" href="my-icons.html">
+<link rel="import" href="./utils/global-behaviors.html">
 
-<!--<link rel="import" href="user/login-form.html">-->
-<!--<link rel="import" href="user/user-profile.html">-->
 <dom-module id="my-user">
   
   <template>
-    <style include="shared-styles">
-      :host {
-        display: block; 
-      }
-    </style>
+
     <app-location route="{{route}}"></app-location>
     
-    <app-route
-        route="{{route}}"
-        pattern="/user/:userPage"
-        data="{{routeData}}">
-    </app-route>
+    <app-route route="{{route}}" pattern="/user/:subpage" data="{{routeData}}"></app-route>
 
     <div class="content">
-
-        <iron-pages
-            selected="[[page]]"
-            attr-for-selected="name"
-            fallback-selection="login"
-            >
-            
-          <login-form name="login"></login-form>
-          <user-profile name="profile"></user-profile>          
-        </iron-pages>
+      <iron-pages selected="[[page]]" attr-for-selected="name">
+        <login-form name="login"></login-form>
+        <user-profile name="profile"></user-profile>
+        <view-404 name="view404"></view-404>
+      </iron-pages>
     </div>
   </template>
+  
 
   <script>
     Polymer({
       is: 'my-user',
-      properties: {
-        page: {
-          type: String,
-          reflectToAttribute: true,
-          observer: '_pageChanged'
-        }
+      behaviors: [routeUtils],
+      properties: { },
+      ready: function() {
+        // console.log(this.parentroute, this.routeData);
+       },
+      routerElement: {
+        defaultRoute: 'login',
+        base: 'user'
       },
-      ready: function() { },
-
-      observers: [
-        '_routePageChanged(routeData.userPage)'
-      ],
-
-      _pageChanged: function(page) {
-        // console.log('Page: ', this.pagesToUrl[page]);
-        // Load page import on demand.
-        var resolvedPageUrl = this.resolveUrl('user/' + this.pagesToUrl[page] + '.html');
-        this.importHref(resolvedPageUrl, null, null, true);
-      },
-
-      _routePageChanged: function(page) {
-        this.page = page || 'login';
-      },
-
       pagesToUrl: {
         login : 'login-form',
         profile: 'user-profile'
-      }
+      }      
     });
   </script>
 </dom-module>

@@ -3,10 +3,13 @@
 <link rel="import" href="../../bower_components/paper-item/paper-item.html">
 <link rel="import" href="../../bower_components/paper-menu/paper-menu.html">
 
-    
+<link rel="import" href="../user/behaviors.html">
 <dom-module id="user-menu">
    
-  <style> 
+  <style>   
+    paper-progress {
+      display: none;
+    }
   </style>
 
   <template>
@@ -17,13 +20,18 @@
       <paper-icon-button icon="icons:account-circle" class="dropdown-trigger"></paper-icon-button>
       <paper-menu class="dropdown-content">
 
-        <template is="dom-if" if="{{user}}">          
-          <paper-item>LogOut</paper-item>        
-        </template>
-        <template is="dom-if" if="{{!user}}">
+        <div hidden$="{{!isLoggedIn}}">
+          <paper-item>
+            <a href="/obs/add">Add Ob</a>
+          </paper-item>          
+          <hr>
+          <paper-item on-tap="logout">LogOut</paper-item>        
+        </div>
+        <div  hidden$="{{isLoggedIn}}">
           <paper-item><a name="loginform" href="/user/login">Login</a></paper-item>
           <!--<paper-item><a name="view3" href="/view3">View Three</a></paper-item>-->
-        </template>
+        </div>
+        <paper-item>Global </paper-item>
       </paper-menu>
     </paper-menu-button>
 
@@ -33,18 +41,11 @@
   <script>
     Polymer({
       is: 'user-menu',
-      properties: {        
-        carmel: {
-          type: Boolean,
-          value: false
-        }
-      },
-      ready: function() {
-        // console.log(this.$.auth.signedIn, this.$.auth.statusKnown, this.user, this.carmel);
-        // this.carmel = true;
-      },
-      care : function(){
-        console.log(this.$.auth.signedIn, this.$.auth.statusKnown);
+      behaviors: [LoginOnlyPage],
+      properties: { },
+      ready: function() { },
+      logout : function(){
+        this.$.auth.signOut();
       }
     });
   </script>

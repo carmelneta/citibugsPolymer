@@ -1,0 +1,105 @@
+
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+
+<link rel="import" href="../../bower_components/google-map/google-map.html">
+<link rel="import" href="../../bower_components/google-map/google-map-marker.html">
+
+<link rel="import" href="../shared-styles.html">
+
+
+<dom-module id="add-ob">
+  <style include="shared-styles">
+  </style>
+  <template>
+     <firebase-auth id="auth" app-name="citybugs" user="{{user}}" status-known="{{fbAuthStatus}}"></firebase-auth>
+
+    <div class="content">
+      <h1>add Ob</h1>
+
+      <paper-input label="Title" type="text" value="{{ob.title}}"></paper-input>
+
+      <google-map latitude="37.779" longitude="-122.3892" min-zoom="9" max-zoom="11"    language="en" 
+      apiKey="AIzaSyBwi5HwsmgdaWS-i5ozjPmOBUPHM4Vi1l0"
+      clientId="citybugs">
+      </google-map>
+      <paper-button on-tap="send" raised disabled="{{!isLoggedIn}}">Send</paper-button>
+    <firebase-query
+        id="query"
+        app-name="citybugs"
+        path="/obs"
+        data="{{data}}">
+    </firebase-query>
+
+
+    <template is="dom-repeat" items="{{data}}" as="ob">
+      <p on-tap="itemClick">{{ob.name}} {{ob.$key}}</p>
+    </template>
+
+    <firebase-document id="mydoc" app-name="citybugs"></firebase-document>
+
+    </div>
+  </template>
+
+  <script>
+    
+    Polymer({
+      is: 'add-ob',
+      
+      behaviors: [LoginOnlyPage],
+      properties: {
+        ob : {
+          type: Object,
+          value: {
+            title: '',
+            uid: null,
+            latitude: null,
+            longitude: null
+          }
+        }
+      },
+      manualPosition: false,
+      ready: function(){
+        console.log('View Ob ready ', this.ob);
+        this.setPosition();
+      },
+      itemClick: function() {
+        console.log();
+        this.$.mydoc.path = '/obs/' + this.data[0].$key;
+        this.$.mydoc.destroy()
+      },
+      send: function() {
+        console.log('Sending...', this.ob, this.user.uid);
+
+        // return;
+
+        var self = this;
+        //set path to null somewhere to avoid overwriting data, I recommend doing it here since save's path update is lazy
+        // this.$.mydoc.path = '/obs/';
+
+        this.ob.uid = this.user.uid;
+        //set data to the value to set/push
+        this.$.mydoc.data = this.ob;
+
+        //call save, if the second parameter is falsey it'll call push to the first parameter if it's truthy it'll set the data to firstparam/secondparam
+        this.$.mydoc.save('obs/').then(function(results) {
+          console.log(results);
+          self.$.mydoc.reset();
+        });
+      },
+
+      setPosition: function() {
+        if( navigator.geolocation ){ 
+          navigator.geolocation.getCurrentPosition( pos => {            
+            this.ob.latitude = pos.coords.latitude;
+            this.ob.longitude = pos.coords.longitude;
+          } );
+        }else {
+          this.manualPosition = true;
+        }
+      }
+    });
+  </script>
+</dom-module>

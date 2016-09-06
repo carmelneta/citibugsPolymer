@@ -1,0 +1,45 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<!--<link rel="import" href="../layout/view-404.html">-->
+
+<script>
+    routeUtils = {
+      ready: function(){
+        // console.log('Global Behavior is ready', this.pagesToUrl);
+      },
+      properties: {
+        page: {
+          type: String,
+          reflectToAttribute: true,
+          observer: '_pageChanged'
+        }
+      },
+      
+      observers: [
+        '_routePageChanged(routeData.subpage)'
+      ],
+
+      _pageChanged: function(page) {
+        // console.log('Page: ', this.pagesToUrl[page], page);
+        // Load page import on demand.
+
+        if( page === 'view404' ){
+          var resolvedPageUrl = this.resolveUrl( 'layout/view-404.html');
+        }else {
+          var resolvedPageUrl = this.resolveUrl( this.routerElement.base + '/' + this.pagesToUrl[page] + '.html');
+        }
+
+        this.importHref(resolvedPageUrl, null, this._showPage404, true);
+      },
+
+      _routePageChanged: function(page) {
+        // console.log('Route Page Change: ', page);
+        this.page = page || this.routerElement.defaultRoute;
+      },
+
+
+      _showPage404: function() {
+        // this.page = 'view404';
+        console.log('not Found');
+      }
+    }
+</script>
