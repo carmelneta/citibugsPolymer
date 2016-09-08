@@ -1,11 +1,9 @@
-
 <link rel="import" href="../../bower_components/polymer/polymer.html">
-
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
-
 <link rel="import" href="../../bower_components/google-map/google-map.html">
 <link rel="import" href="../../bower_components/google-map/google-map-marker.html">
+<link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
 
 
 <link rel="import" href="../utils/carmel-upload.html">
@@ -18,6 +16,16 @@
     google-map {
       height: 300px;
     }
+
+    #login-toast {
+      --paper-toast-background-color: red;
+      --paper-toast-color: white;
+    }
+
+    #login-toast a{ 
+      color: white;
+    }
+
   </style>
   <template>
      <firebase-auth id="auth" app-name="citybugs" user="{{user}}" status-known="{{fbAuthStatus}}"></firebase-auth>
@@ -26,39 +34,54 @@
       <h1>add Ob</h1>
 
       <paper-input label="Title" type="text" value="{{ob.title}}"></paper-input>
+      
        <div hidden$="{{!manualPosition}}">
-        <google-map latitude="32.7940463" longitude="34.98957100000007" min-zoom="5"                    
-                    id="map" 
-                    on-google-map-ready="mapReady"
-                    api-key="AIzaSyC6kRcVxUstH47JsWSKv-1Rk6ZUFzxGGUM">
 
-          <google-map-marker id="marker" latitude="32.7940463" longitude="34.98957100000007" draggable="true"
-                    
-                    on-google-map-marker-dragend="markerDragEnd"
-                    drag-events="true">
+        <google-map latitude="32.7940463" 
+          longitude="34.98957100000007"
+          min-zoom="5"                    
+          id="map" 
+          on-google-map-ready="mapReady"
+          api-key="AIzaSyC6kRcVxUstH47JsWSKv-1Rk6ZUFzxGGUM">
+
+          <google-map-marker id="marker" 
+            latitude="32.7940463" 
+            longitude="34.98957100000007" 
+            draggable="true"
+            on-google-map-marker-dragend="markerDragEnd"
+            drag-events="true">
           </google-map-marker>
+
         </google-map>
       </div>
+
+      <carmel-upload uid="[[user.uid]]" images="{{ob.images}}"></carmel-upload>
+
       <paper-button on-tap="send" raised disabled="{{!isLoggedIn}}">Send</paper-button>
-      <paper-button on-tap="test" raised>TEST</paper-button>
-
-      <carmel-upload uid="[[user.uid]]"></carmel-upload>
-
+      
       <firebase-query
           id="query"
           app-name="citybugs"
           path="/obs"
           data="{{data}}">
       </firebase-query>
-
       
       <firebase-document id="mydoc" app-name="citybugs"></firebase-document>
 
-      <template hidden$="{{!manualPosition}}"> Should Show map </template>
+       <paper-toast id="login-toast" class="fit-bottom" opened="[[showLoginToaster]]" duration="Infinity">
+        Please <a href="/user/login"><strong>Login</strong></a> to add observation.
+      </paper-toast>
 
-      <template is="dom-repeat" items="{{data}}" as="ob">
-        <p on-tap="itemClick">{{ob.name}} {{ob.$key}}</p>
-      </template>
+      <div id="testing" style="display: none;">
+        <hr>
+        
+        <paper-button on-tap="test" raised>TEST</paper-button>
+
+        <template is="dom-repeat" items="{{data}}" as="ob">
+          <p on-tap="itemClick">{{ob.name}} {{ob.$key}}</p>
+        </template>
+
+      </div>
 
 
     </div>
@@ -76,16 +99,20 @@
             title: '',
             uid: null,
             latitude: null,
-            longitude: null
+            longitude: null,
+            images: []
           }
         }
       }, 
-      deviceHasGeo: false,
-      carmel: null,
+      observers: [
+        '_updateToaster(isLoggedIn, fbAuthStatus)'
+      ],
+      deviceHasGeo: false, 
       ready: function(){
-        console.log('View Ob ready ', this.ob);
+        console.log('View Ob ready ', this.ob, this.fbAuthStatus);
         this.manualPosition = true;
         this.setPosition();
+        this.showLoginToaster = false;   
       },
       itemClick: function() {
         console.log();
@@ -94,10 +121,9 @@
       },
       send: function() {
 
-        // console.log('Sending...', this.ob, this.user.uid, this.$ );
+        console.log('Sending...', this.ob, this.user.uid, this.$ );
         // return;
  
-
         this.ob.uid = this.user.uid;
         //set data to the value to set/push
         this.$.mydoc.data = this.ob;
@@ -143,9 +169,15 @@
       mapReady: function(e) { 
         // console.log(e);
       },
+      _updateToaster: function() {        
+        this.showLoginToaster = this.fbAuthStatus && !this.isLoggedIn; 
+      },
       test: function() {
-        console.log(this.ob);
-        // console.log(this.$)
+        // console.log(this.ob);
+        // console.log(this.$);
+        // console.log(this.ob.images);
+        console.log('CARMEL', this.fbAuthStatus);
+        
       }
     });
   </script>

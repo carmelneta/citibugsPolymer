@@ -1,0 +1,23 @@
+
+<script>
+    ObsBehavior = {
+      properties: { 
+        fbAuthStatus: {
+          type: Boolean,
+          value: false,
+          observer: '_AuthStatusKnownChange'
+        },
+        isLoggedIn: {
+          //  Is Logged in will true only after the auth status is ready AND the user is logged in
+          type: Boolean,
+          value: false
+        },
+        user: {
+          type: Object,
+          observer: '_AuthUserChange'
+        }
+      },
+      attached: function() {    },
+ 
+    };
+</script>

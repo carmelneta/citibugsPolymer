@@ -10,12 +10,14 @@
     
     <app-route route="{{route}}" pattern="/obs/:subpage" data="{{routeData}}">
     </app-route>
+    
 
     <div class="content">
 
         <iron-pages selected="[[page]]" attr-for-selected="name">            
-          <view-ob name="view"></view-ob>
-          <add-ob name="add"></add-ob>          
+          <view-ob  name="view"></view-ob>
+          <add-ob   name="add"></add-ob>          
+          <user-obs name="user"></user-obs>
           <view-404 name="view404"></view-404>
         </iron-pages>
     </div>
@@ -26,8 +28,7 @@
       is: 'my-obs',
       behaviors: [routeUtils],
       counter: 1, 
-      ready: function() {  
-      },
+      ready: function() { },
       
       routerElement: {
         defaultRoute: 'view',
@@ -35,7 +36,8 @@
       },
       pagesToUrl: {
         view : 'view-ob',
-        add: 'add-ob'
+        add:   'add-ob',
+        user:  'user-obs'
       }
     });
   </script>

@@ -1,0 +1,47 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../themplates/ob-card.html">
+<link rel="import" href="../shared-styles.html">
+
+
+<dom-module id="user-obs">
+  <style include="shared-styles">
+    ob-card {
+      /*width: 50%;*/
+    }
+  </style>
+  <template>
+
+    <firebase-auth id="auth" app-name="citybugs" user="{{user}}" status-known="{{fbAuthStatus}}"></firebase-auth>
+
+    <div class="content">
+      
+      <h1>My Observations</h1>
+
+      <template is="dom-if" if=[[user]]>
+        <firebase-query
+            id="query"
+            app-name="citybugs"
+            path="/obs"
+            order-by-child="uid"
+            equal-to="Okks2sNMjHXUxfqKSY4CVFLc7wu1"
+            data="{{data}}">
+        </firebase-query>
+        <div class="horizontal justifaied layout">
+          <template is="dom-repeat" items="{{data}}" as="ob">
+            <ob-card ob="{{ob}}"></ob-card>
+          </template>
+        </div>
+      </template> 
+
+    </div>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'user-obs',      
+      behaviors: [LoginOnlyPage],
+      ready: function() { 
+        // console.log(this.uid);
+      }
+    });
+  </script>

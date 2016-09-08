@@ -1,0 +1,52 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../obs/obs-behaviors.html">
+
+<link rel="import" href="../shared-styles.html">
+
+
+<dom-module id="ob-card">
+  <style include="shared-styles">
+    paper-card {
+      margin: 10px 10px 10px 0; 
+      /*max-width: 50%;*/
+    }
+    paper-card.white {
+      --paper-card-header-color: #fff;
+    }
+  </style>
+  <template>
+  <template is="dom-if" if="{{ob}}">
+    
+      <paper-card heading="{{ob.title}}" image="{{_computeObImage()}}" class="white">
+        <div class="card-actions horizontal justified">
+          <paper-icon-button icon="favorite"></paper-icon-button>
+          <paper-icon-button icon="bookmark"></paper-icon-button>
+        </div>
+      </paper-card>
+
+  </template>
+  </template>
+
+  <script>
+    
+    Polymer({
+      is: "ob-card",      
+      behaviors: [ObsBehavior],
+      properties: {
+        ob: Object
+      },
+
+      ready: function() {
+        console.log('Ob Card: ', this.ob);
+      },
+      _computeObImage: function() { 
+        if(this.ob.images && this.ob.images[0]) {
+          return this.ob.images[0].url;
+        }
+        return "https://placeholdit.imgix.net/~text?txtsize=33&txt=350%C3%97150&w=350&h=150";
+      }
+    });
+  </script>
+
+</dom-module>

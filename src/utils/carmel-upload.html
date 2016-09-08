@@ -5,8 +5,9 @@
 <link rel="import" href="../../bower_components/file-input/file-input.html">
 <link rel="import" href="../../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="../../bower_components/paper-card/paper-card.html">
-
-
+<link rel="import" href="../../bower_components/paper-badge/paper-badge.html">
+<link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+ 
 <link rel="import" href="../shared-styles.html">
 
 <dom-module id="carmel-upload">
@@ -27,15 +28,22 @@
 
 
       #image-preview {
-        border: 1px dashed #00ba35;
         margin: 20px 0;
       }
       #image-preview img {
-        width: 90px;
-        height: 90px;
-        margin: 10px;
+        max-width: 100%;
+        display: block; 
       }
-      
+
+      .image-holder {        
+        position: relative;
+        border: 1px solid #eeeeee;
+        border-radius: 10px;
+        background: #fff;
+        padding: 5px;
+        margin: 5px 0;
+        max-width: 28%;
+      } 
     </style>
      
     <firebase-document
@@ -46,16 +54,19 @@
     </firebase-document>
 
     <paper-button raised>
-      <file-input id="mainFile" on-change="_onUpload">Image</file-input>
+      <file-input id="mainFile" on-change="_onUpload">Upload Images</file-input>
     </paper-button>
     
-    <paper-button raised on-tap="test">TEST FILE</paper-button>
-  
+    <!--<paper-button on-tap="test">TEST</paper-button>-->
+
     <paper-spinner-lite active=[[_isLoading]]></paper-spinner-lite>
-      
-    <div class="layout horizontal wrap around-justified" id="image-preview"> 
-      <template is="dom-repeat" items="{{images}}"  id="imagesRepeat">
-        <img src="[[item.url]]"> 
+     
+    <div class="layout horizontal wrap justified" id="image-preview"> 
+      <template is="dom-repeat" items="{{images}}">
+        <div class="image-holder" tabindex="0">
+          <img src="[[item.url]]">          
+          <paper-badge icon="icons:close" label="remove" on-tap="_deleteImg"> </paper-badge>          
+        </div>
       </template>
     </div>
 
@@ -63,29 +74,40 @@
 
   <script>
     Polymer({
-      is: 'carmel-upload',
-      
+      is: 'carmel-upload', 
       properties: {
-        ref: {
-          type: String
-        },
         uid: String,
         _isLoading: {
           type: Boolean
         },
         images: {
           type: Array,
-          value: []
+          value: [],          
+          notify: true
+        },
+        show: {
+          type: Boolean,
+          value: true
         }
       },
 
-      ready: function() {  
-      },
+      ready: function() { },
     
-      _onUpload: function(e, detail) {
-        
-        for(var i=0; i < detail.valid.length; i++) {
-          // console.log(i, detail.valid[i]);
+      test: function() {
+        console.log(this.images);
+
+        var tempImages = [
+          { fullPath: "images/Okks2sNMjHXUxfqKSY4CVFLc7wu1/carmel.jpg",name:"carmel.jpg", url:"https://placeholdit.imgix.net/~text?txtsize=33&txt=350%C3%97150&w=350&h=150"},
+          { fullPath: "images/Okks2sNMjHXUxfqKSY4CVFLc7wu1/2011-12-25 21.39.56.jpg", name: "2011-12-25 21.39.56.jpg", url: "https://placeholdit.imgix.net/~text?txtsize=33&txt=350%C3%97150&w=350&h=150"},
+          { fullPath: "images/Okks2sNMjHXUxfqKSY4CVFLc7wu1/2013-09-10 20.50.11.jpg", name: "2013-09-10 20.50.11.jpg", url: "https://placeholdit.imgix.net/~text?txtsize=33&txt=350%C3%97150&w=350&h=150"},
+          { fullPath: "images/Okks2sNMjHXUxfqKSY4CVFLc7wu1/2011-12-24 19.39.57.jpg", name: "2011-12-24 19.39.57.jpg", url: "https://placeholdit.imgix.net/~text?txtsize=33&txt=350%C3%97150&w=350&h=150"}
+        ];
+        // return;
+        this.set('images', tempImages);
+      },
+
+      _onUpload: function(e, detail) {        
+        for(var i=0; i < detail.valid.length; i++) { 
           this._doUpload(detail.valid[i]);
         }
       },
@@ -111,12 +133,32 @@
             name: file.name,
             url: uploadTask.snapshot.metadata.downloadURLs[0]
           };
-          console.log(metadata);
+          console.log(uploadTask.snapshot);
           // this.images.push(metadata);
           this._isLoading = false;
-           this.push('images', metadata);
+          this.push('images', metadata);
         });
+      },
+
+      _deleteImg: function(event) {
+        const item = event.model.item;
+        const index = event.model.index;
+
+        var storageRef = this.$.fbDoc.app.storage().ref();
+        var desertRef = storageRef.child(item.fullPath);
+
+        // Delete the file
+        desertRef.delete()
+        .then(success => {
+          // console.log( 'success' ,success);
+          
+          // Remove image from array  
+          this.splice('images', index, 1);
+        })
+        .catch(error => console.log('error', error))
+        ;
       }
+ 
 
     });
   </script>
